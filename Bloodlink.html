@@ -1,0 +1,2810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Bank Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css">
+    <style>
+        :root {
+            --primary: #e63946;
+            --primary-dark: #c1121f;
+            --secondary: #f1faee;
+            --dark: #1d3557;
+            --light: #a8dadc;
+            --success: #2a9d8f;
+            --warning: #e9c46a;
+            --danger: #e76f51;
+            --gray: #6c757d;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: var(--dark);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+            position: relative;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a i {
+            margin-right: 5px;
+        }
+
+        .nav-links a:hover {
+            color: var(--light);
+        }
+
+        .nav-links .active a {
+            color: var(--primary);
+        }
+
+        .nav-links .badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 10px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.6rem 1.3rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-lg {
+            padding: 0.8rem 1.8rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: #333;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 0.5rem 0;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.2);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            background-size: 1rem;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .alert i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .alert-success {
+            background-color: rgba(42, 157, 143, 0.1);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-danger {
+            background-color: rgba(231, 111, 81, 0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        .alert-warning {
+            background-color: rgba(233, 196, 106, 0.1);
+            color: #b68b00;
+            border-left: 4px solid var(--warning);
+        }
+
+        .alert-info {
+            background-color: rgba(29, 53, 87, 0.1);
+            color: var(--dark);
+            border-left: 4px solid var(--dark);
+        }
+
+        /* Table Styles */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        .table th, .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .table th {
+            background-color: rgba(29, 53, 87, 0.05);
+            font-weight: 600;
+            color: var(--dark);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table tr:hover {
+            background-color: rgba(29, 53, 87, 0.02);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Badge Styles */
+        .badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 50rem;
+        }
+
+        .badge-pill {
+            border-radius: 50rem;
+        }
+
+        .badge-primary {
+            color: white;
+            background-color: var(--primary);
+        }
+
+        .badge-secondary {
+            color: white;
+            background-color: var(--gray);
+        }
+
+        .badge-success {
+            color: white;
+            background-color: var(--success);
+        }
+
+        .badge-warning {
+            color: #212529;
+            background-color: var(--warning);
+        }
+
+        .badge-danger {
+            color: white;
+            background-color: var(--danger);
+        }
+
+        .badge-info {
+            color: white;
+            background-color: var(--light);
+        }
+
+        .badge-dark {
+            color: white;
+            background-color: var(--dark);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .dashboard-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .dashboard-card p {
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+
+        /* Blood Group Styles */
+        .blood-group {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .blood-group-aplus { color: #e63946; }
+        .blood-group-aminus { color: #a8dadc; }
+        .blood-group-bplus { color: #1d3557; }
+        .blood-group-bminus { color: #457b9d; }
+        .blood-group-abplus { color: #2a9d8f; }
+        .blood-group-abminus { color: #e9c46a; }
+        .blood-group-oplus { color: #e76f51; }
+        .blood-group-ominus { color: #8338ec; }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { 
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-primary { color: var(--primary); }
+        .text-success { color: var(--success); }
+        .text-warning { color: #b68b00; }
+        .text-danger { color: var(--danger); }
+        .text-dark { color: var(--dark); }
+        .text-muted { color: var(--gray); }
+
+        .mb-0 { margin-bottom: 0; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 2rem; }
+
+        .mt-0 { margin-top: 0; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mt-4 { margin-top: 2rem; }
+
+        .p-3 { padding: 1.5rem; }
+
+        .d-flex { display: flex; }
+        .align-items-center { align-items: center; }
+        .justify-content-between { justify-content: space-between; }
+
+        /* Map Container */
+        #map {
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: var(--dark);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+            overflow-y: auto;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+        }
+
+        .modal-dialog {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            margin: 1.75rem auto;
+            transform: translateY(-50px);
+            transition: transform 0.3s;
+        }
+
+        .modal.show .modal-dialog {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+
+        .close:hover {
+            opacity: 1;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: var(--dark);
+                flex-direction: column;
+                align-items: center;
+                padding: 2rem 0;
+                transition: all 0.3s ease;
+            }
+
+            .nav-links.active {
+                left: 0;
+            }
+
+            .nav-links li {
+                margin: 1rem 0;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            animation: fadeInUp 1s ease 0.2s forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 3rem 0;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            text-align: center;
+            height: 100%;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        /* Stats Section */
+        .stats {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            padding: 4rem 0;
+            margin: 3rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 0 1.5rem;
+        }
+
+        .footer-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links h4 {
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-links h4::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--light);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -40px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 4px solid white;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .timeline-date {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content {
+            background: white;
+            border-radius: 6px;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Blood Compatibility Chart */
+        .compatibility-chart {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .compatibility-chart th, 
+        .compatibility-chart td {
+            border: 1px solid #ddd;
+            padding: 0.8rem;
+            text-align: center;
+        }
+
+        .compatibility-chart th {
+            background-color: rgba(29, 53, 87, 0.1);
+            font-weight: 600;
+        }
+
+        .compatible {
+            background-color: rgba(42, 157, 143, 0.2);
+            color: var(--success);
+        }
+
+        .not-compatible {
+            background-color: rgba(231, 111, 81, 0.1);
+            color: var(--danger);
+        }
+
+        /* Emergency Banner */
+        .emergency-banner {
+            background: var(--danger);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 111, 81, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 111, 81, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 111, 81, 0); }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="#" class="logo">
+                    <i class="fas fa-heartbeat"></i> BloodLink
+                </a>
+                <button class="mobile-menu-btn" id="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <ul class="nav-links" id="nav-links">
+                    <li class="active"><a href="#home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="#donate"><i class="fas fa-hand-holding-medical"></i> Donate</a></li>
+                    <li><a href="#request"><i class="fas fa-tint"></i> Request Blood</a></li>
+                    <li><a href="#inventory"><i class="fas fa-warehouse"></i> Inventory</a></li>
+                    <li><a href="#about"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
+                    <li>
+                        <a href="#" id="login-btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+                        <span class="badge">3</span>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Save Lives, Donate Blood</h1>
+            <p>Join our community of blood donors and help us maintain a steady supply of blood for those in need. Your single donation can save up to three lives.</p>
+            <a href="#donate" class="btn btn-lg">Become a Donor</a>
+            <a href="#request" class="btn btn-outline btn-lg">Request Blood</a>
+        </div>
+    </section>
+
+    <!-- Emergency Banner -->
+    <div class="container">
+        <div class="emergency-banner">
+            <i class="fas fa-exclamation-triangle"></i> <strong>URGENT NEED:</strong> We currently have a critical shortage of O- blood type. Please donate if you can.
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="text-center mb-4">Why Donate With Us?</h2>
+            <div class="dashboard-grid">
+                <div class="feature-card slide-up" style="animation-delay: 0.1s;">
+                    <div class="feature-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h3>Save Lives</h3>
+                    <p>Your blood donation can save up to three lives. Every donation makes a difference in someone's life.</p>
+                </div>
+                <div class="feature-card slide-up" style="animation-delay: 0.2s;">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Safe Process</h3>
+                    <p>Our donation process is safe, sterile, and supervised by medical professionals. Your health is our priority.</p>
+                </div>
+                <div class="feature-card slide-up" style="animation-delay: 0.3s;">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Real-time Tracking</h3>
+                    <p>Track your donations, see your impact, and receive notifications when your blood type is needed.</p>
+                </div>
+                <div class="feature-card slide-up" style="animation-delay: 0.4s;">
+                    <div class="feature-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <h3>Rewards Program</h3>
+                    <p>Earn points for each donation that can be redeemed for health checkups and other benefits.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="dashboard-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="donors-count">5,327</div>
+                    <div class="stat-label">Registered Donors</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="donations-count">12,894</div>
+                    <div class="stat-label">Donations Made</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="lives-saved">38,682</div>
+                    <div class="stat-label">Lives Saved</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="blood-units">1,243</div>
+                    <div class="stat-label">Units Available</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Donate Section -->
+    <section class="container" id="donate">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-hand-holding-medical"></i> Become a Blood Donor</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Please fill out the form below to register as a blood donor. All information will be kept confidential.
+                </div>
+                
+                <form id="donor-form">
+                    <div class="form-group">
+                        <label for="full-name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="full-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="blood-group" class="form-label">Blood Group</label>
+                        <select class="form-control" id="blood-group" required>
+                            <option value="">Select Blood Group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dob" class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" id="dob" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gender" class="form-label">Gender</label>
+                        <select class="form-control" id="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="last-donation" class="form-label">Last Donation Date (if any)</label>
+                        <input type="date" class="form-control" id="last-donation">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="agree-terms" required>
+                            <label class="form-check-label" for="agree-terms">
+                                I agree to the terms and conditions and confirm that all information provided is accurate.
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn">Register as Donor</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blood Compatibility Section -->
+    <section class="container mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-exchange-alt"></i> Blood Type Compatibility</h2>
+            </div>
+            <div class="card-body">
+                <p>Not all blood types are compatible. Use this chart to see which blood types can donate to and receive from other types.</p>
+                
+                <div class="table-responsive">
+                    <table class="compatibility-chart">
+                        <thead>
+                            <tr>
+                                <th>Recipient →<br>Donor ↓</th>
+                                <th>A+</th>
+                                <th>A-</th>
+                                <th>B+</th>
+                                <th>B-</th>
+                                <th>AB+</th>
+                                <th>AB-</th>
+                                <th>O+</th>
+                                <th>O-</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>A+</th>
+                                <td class="compatible">✓</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="compatible">✓</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>A-</th>
+                                <td class="compatible">✓</td>
+                                <td class="compatible">✓</td>
+                                <td></td>
+                                <td></td>
+                                <td class="compatible">✓</td>
+                                <td class="compatible">✓</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>B+</th>
+                                <td></td>
+                                <td></td>
+                                <td class="compatible">✓</td>
+                                <td></td>
+                                <td class="compatible">✓</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>B-</th>
+                                <td></td>
+                                <td></td>
+                                <td class="compatible">✓</td>
+                                <td class="compatible">✓</td>
+                                <td class="compatible">✓</td>
+                                <td class="compatible">✓</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>AB+</th>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="compatible">✓</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>AB-</th>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td class="compatible">✓</td>
+                                <td class="compatible">✓</td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>O+</th>
+                                <td class="compatible">✓</td>
+                                <td></td>
+                                <td class="compatible">✓</td>
+                                <td></td>
+                                <td class="compatible">✓</td>
+                                <td></td>
+                                <td class="compatible">✓</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th>O-</th>
+                                <td class="compatible">✓</td>
+                                <td class="compatible">✓</td>
+                                <td class="compatible">✓</td>
+                                <td class="compatible">✓</td>
+                                <td class="compatible">✓</td>
+                                <td class="compatible">✓</td>
+                                <td class="compatible">✓</td>
+                                <td class="compatible">✓</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-3">
+                    <p><strong>Key:</strong></p>
+                    <p><span class="compatible" style="padding: 0.2rem 0.5rem;">✓</span> = Compatible</p>
+                    <p><span class="not-compatible" style="padding: 0.2rem 0.5rem;">✗</span> = Not Compatible (not shown in table)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Request Blood Section -->
+    <section class="container mt-4" id="request">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-tint"></i> Request Blood</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-circle"></i> Blood requests are subject to availability and approval by our medical team.
+                </div>
+                
+                <form id="request-form">
+                    <div class="form-group">
+                        <label for="patient-name" class="form-label">Patient Name</label>
+                        <input type="text" class="form-control" id="patient-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hospital" class="form-label">Hospital/Clinic Name</label>
+                        <input type="text" class="form-control" id="hospital" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="request-blood-group" class="form-label">Blood Group Required</label>
+                        <select class="form-control" id="request-blood-group" required>
+                            <option value="">Select Blood Group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="units-needed" class="form-label">Units Needed</label>
+                        <input type="number" class="form-control" id="units-needed" min="1" max="10" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="urgency" class="form-label">Urgency Level</label>
+                        <select class="form-control" id="urgency" required>
+                            <option value="normal">Normal (within 48 hours)</option>
+                            <option value="urgent">Urgent (within 24 hours)</option>
+                            <option value="emergency">Emergency (immediate need)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="required-date" class="form-label">Required By Date</label>
+                        <input type="date" class="form-control" id="required-date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-person" class="form-label">Contact Person</label>
+                        <input type="text" class="form-control" id="contact-person" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact-phone" class="form-label">Contact Phone</label>
+                        <input type="tel" class="form-control" id="contact-phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reason" class="form-label">Reason for Request</label>
+                        <textarea class="form-control" id="reason" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="doctor-name" class="form-label">Doctor's Name</label>
+                        <input type="text" class="form-control" id="doctor-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="doctor-contact" class="form-label">Doctor's Contact</label>
+                        <input type="text" class="form-control" id="doctor-contact" required>
+                    </div>
+                    
+                    <button type="submit" class="btn">Submit Request</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Inventory Section -->
+    <section class="container mt-4" id="inventory">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-warehouse"></i> Blood Inventory</h2>
+                <div class="d-flex align-items-center">
+                    <span class="mr-2">Last Updated: <span id="last-updated">Today, 10:30 AM</span></span>
+                    <button class="btn btn-sm btn-outline" id="refresh-inventory">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tabs">
+                    <div class="tab active" data-tab="summary">Summary</div>
+                    <div class="tab" data-tab="chart">Visualization</div>
+                    <div class="tab" data-tab="details">Detailed View</div>
+                </div>
+                
+                <div class="tab-content active" id="summary-tab">
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <div class="icon">
+                                <i class="fas fa-tint blood-group-aplus"></i>
+                            </div>
+                            <h3 id="aplus-count">124</h3>
+                            <p>A+ Units Available</p>
+                            <div class="inventory-status" id="aplus-status">Adequate</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="icon">
+                                <i class="fas fa-tint blood-group-aminus"></i>
+                            </div>
+                            <h3 id="aminus-count">87</h3>
+                            <p>A- Units Available</p>
+                            <div class="inventory-status" id="aminus-status">Low</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="icon">
+                                <i class="fas fa-tint blood-group-bplus"></i>
+                            </div>
+                            <h3 id="bplus-count">156</h3>
+                            <p>B+ Units Available</p>
+                            <div class="inventory-status" id="bplus-status">Adequate</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="icon">
+                                <i class="fas fa-tint blood-group-bminus"></i>
+                            </div>
+                            <h3 id="bminus-count">92</h3>
+                            <p>B- Units Available</p>
+                            <div class="inventory-status" id="bminus-status">Adequate</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="icon">
+                                <i class="fas fa-tint blood-group-abplus"></i>
+                            </div>
+                            <h3 id="abplus-count">45</h3>
+                            <p>AB+ Units Available</p>
+                            <div class="inventory-status" id="abplus-status">Critical</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="icon">
+                                <i class="fas fa-tint blood-group-abminus"></i>
+                            </div>
+                            <h3 id="abminus-count">32</h3>
+                            <p>AB- Units Available</p>
+                            <div class="inventory-status" id="abminus-status">Critical</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="icon">
+                                <i class="fas fa-tint blood-group-oplus"></i>
+                            </div>
+                            <h3 id="oplus-count">210</h3>
+                            <p>O+ Units Available</p>
+                            <div class="inventory-status" id="oplus-status">Adequate</div>
+                        </div>
+                        <div class="dashboard-card">
+                            <div class="icon">
+                                <i class="fas fa-tint blood-group-ominus"></i>
+                            </div>
+                            <h3 id="ominus-count">18</h3>
+                            <p>O- Units Available</p>
+                            <div class="inventory-status" id="ominus-status">Emergency</div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Inventory Status Key:</strong> 
+                        <span class="badge badge-success">Adequate</span> = More than 50 units, 
+                        <span class="badge badge-warning">Low</span> = 25-50 units, 
+                        <span class="badge badge-danger">Critical</span> = 10-25 units, 
+                        <span class="badge badge-danger">Emergency</span> = Less than 10 units
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="chart-tab">
+                    <canvas id="inventory-chart" height="300"></canvas>
+                    <div class="mt-3">
+                        <h4>Blood Usage Trends</h4>
+                        <canvas id="usage-trend-chart" height="200"></canvas>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="details-tab">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Blood Group</th>
+                                    <th>Available Units</th>
+                                    <th>Reserved Units</th>
+                                    <th>Expiring Soon</th>
+                                    <th>Last Donation</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>A+</td>
+                                    <td>124</td>
+                                    <td>15</td>
+                                    <td>8</td>
+                                    <td>2 hours ago</td>
+                                    <td><span class="badge badge-success">Adequate</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline">View Details</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>A-</td>
+                                    <td>87</td>
+                                    <td>12</td>
+                                    <td>5</td>
+                                    <td>5 hours ago</td>
+                                    <td><span class="badge badge-warning">Low</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline">View Details</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>B+</td>
+                                    <td>156</td>
+                                    <td>20</td>
+                                    <td>10</td>
+                                    <td>1 hour ago</td>
+                                    <td><span class="badge badge-success">Adequate</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline">View Details</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>B-</td>
+                                    <td>92</td>
+                                    <td>8</td>
+                                    <td>3</td>
+                                    <td>3 hours ago</td>
+                                    <td><span class="badge badge-success">Adequate</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline">View Details</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>AB+</td>
+                                    <td>45</td>
+                                    <td>5</td>
+                                    <td>2</td>
+                                    <td>8 hours ago</td>
+                                    <td><span class="badge badge-danger">Critical</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline">View Details</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>AB-</td>
+                                    <td>32</td>
+                                    <td>4</td>
+                                    <td>1</td>
+                                    <td>12 hours ago</td>
+                                    <td><span class="badge badge-danger">Critical</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline">View Details</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>O+</td>
+                                    <td>210</td>
+                                    <td>25</td>
+                                    <td>15</td>
+                                    <td>30 minutes ago</td>
+                                    <td><span class="badge badge-success">Adequate</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline">View Details</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>O-</td>
+                                    <td>18</td>
+                                    <td>3</td>
+                                    <td>0</td>
+                                    <td>6 hours ago</td>
+                                    <td><span class="badge badge-danger">Emergency</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline">View Details</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Donor Map Section -->
+    <section class="container mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-map-marked-alt"></i> Donor Locations</h2>
+            </div>
+            <div class="card-body">
+                <div id="map"></div>
+                <div class="mt-3">
+                    <p>This map shows the geographical distribution of our registered blood donors. You can filter by blood type to find donors near you.</p>
+                    <div class="form-group">
+                        <label for="filter-blood-type" class="form-label">Filter by Blood Type</label>
+                        <select class="form-control" id="filter-blood-type">
+                            <option value="all">All Blood Types</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="container mt-4" id="about">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-info-circle"></i> About BloodLink</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Our Mission</h3>
+                        <p>BloodLink is a comprehensive blood bank management system designed to bridge the gap between blood donors and recipients. Our mission is to ensure that no patient dies due to unavailability of blood.</p>
+                        
+                        <h3 class="mt-4">How It Works</h3>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-date">Step 1</div>
+                                <div class="timeline-content">
+                                    <h4>Donor Registration</h4>
+                                    <p>Individuals register as blood donors by providing their details and blood type.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">Step 2</div>
+                                <div class="timeline-content">
+                                    <h4>Blood Donation</h4>
+                                    <p>Donors visit our centers to donate blood, which is then tested and stored.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">Step 3</div>
+                                <div class="timeline-content">
+                                    <h4>Blood Request</h4>
+                                    <p>Hospitals or patients in need request specific blood types through our system.</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-date">Step 4</div>
+                                <div class="timeline-content">
+                                    <h4>Matching & Delivery</h4>
+                                    <p>We match requests with available blood and coordinate delivery to the recipient.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Blood Donation Facts</h3>
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <i class="fas fa-heartbeat text-primary mr-2"></i>
+                                <strong>One donation</strong> can save up to three lives.
+                            </div>
+                        </div>
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <i class="fas fa-clock text-primary mr-2"></i>
+                                The entire donation process takes about <strong>45 minutes</strong> to an hour.
+                            </div>
+                        </div>
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <i class="fas fa-calendar-alt text-primary mr-2"></i>
+                                You can donate whole blood every <strong>56 days</strong>.
+                            </div>
+                        </div>
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <i class="fas fa-users text-primary mr-2"></i>
+                                About <strong>38%</strong> of the population is eligible to donate blood, but less than 10% actually do.
+                            </div>
+                        </div>
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <i class="fas fa-bolt text-primary mr-2"></i>
+                                Blood cannot be manufactured—it can only come from <strong>volunteer donors</strong>.
+                            </div>
+                        </div>
+                        
+                        <h3 class="mt-4">Our Team</h3>
+                        <p>BloodLink is developed and maintained by a dedicated team of healthcare professionals, software engineers, and community volunteers committed to saving lives through technology.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="container mt-4" id="contact">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-envelope"></i> Contact Us</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Get In Touch</h3>
+                        <p>Have questions or need assistance? Reach out to our team through any of the following channels:</p>
+                        
+                        <div class="contact-info mt-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-map-marker-alt text-primary mr-3" style="font-size: 1.5rem;"></i>
+                                <div>
+                                    <h5 class="mb-0">Address</h5>
+                                    <p class="mb-0">123 Health Street, Medical City, MC 12345</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-phone-alt text-primary mr-3" style="font-size: 1.5rem;"></i>
+                                <div>
+                                    <h5 class="mb-0">Phone</h5>
+                                    <p class="mb-0">(123) 456-7890</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-envelope text-primary mr-3" style="font-size: 1.5rem;"></i>
+                                <div>
+                                    <h5 class="mb-0">Email</h5>
+                                    <p class="mb-0">info@bloodlink.org</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-clock text-primary mr-3" style="font-size: 1.5rem;"></i>
+                                <div>
+                                    <h5 class="mb-0">Hours</h5>
+                                    <p class="mb-0">Monday - Friday: 8:00 AM - 6:00 PM</p>
+                                    <p class="mb-0">Saturday: 9:00 AM - 3:00 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Send Us a Message</h3>
+                        <form id="contact-form">
+                            <div class="form-group">
+                                <label for="contact-name" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" id="contact-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="contact-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-subject" class="form-label">Subject</label>
+                                <input type="text" class="form-control" id="contact-subject" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-message" class="form-label">Message</label>
+                                <textarea class="form-control" id="contact-message" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="btn">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer mt-4">
+        <div class="container">
+            <div class="footer-links">
+                <div>
+                    <h4>BloodLink</h4>
+                    <p>Connecting donors with recipients to save lives through blood donation.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#donate">Donate Blood</a></li>
+                        <li><a href="#request">Request Blood</a></li>
+                        <li><a href="#inventory">Blood Inventory</a></li>
+                        <li><a href="#about">About Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Eligibility Criteria</a></li>
+                        <li><a href="#">Donation Process</a></li>
+                        <li><a href="#">Blood Types</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 BloodLink. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h5 class="modal-title">Login to BloodLink</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="modal-login-form">
+                    <div class="form-group">
+                        <label for="login-email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="login-password" required>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="remember-me">
+                            <label class="form-check-label" for="remember-me">
+                                Remember me
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-block">Login</button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="#" id="forgot-password">Forgot password?</a>
+                    <p class="mt-2">Don't have an account? <a href="#" id="show-register">Register here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h5 class="modal-title">Create an Account</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="modal-register-form">
+                    <div class="form-group">
+                        <label for="register-name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="register-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="register-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="register-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="register-confirm-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-role" class="form-label">I want to:</label>
+                        <select class="form-control" id="register-role" required>
+                            <option value="">Select Option</option>
+                            <option value="donor">Donate Blood</option>
+                            <option value="recipient">Request Blood</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="agree-terms-modal" required>
+                            <label class="form-check-label" for="agree-terms-modal">
+                                I agree to the <a href="#">terms and conditions</a>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-block">Register</button>
+                </form>
+                <div class="text-center mt-3">
+                    <p>Already have an account? <a href="#" id="show-login">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard (Hidden by default) -->
+    <div id="admin-dashboard" style="display: none;">
+        <div class="header">
+            <div class="container">
+                <nav class="navbar">
+                    <a href="#" class="logo">
+                        <i class="fas fa-heartbeat"></i> BloodLink Admin
+                    </a>
+                    <ul class="nav-links" id="admin-nav-links">
+                        <li class="active"><a href="#admin-home"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="#admin-donors"><i class="fas fa-users"></i> Donors</a></li>
+                        <li><a href="#admin-inventory"><i class="fas fa-warehouse"></i> Inventory</a></li>
+                        <li><a href="#admin-requests"><i class="fas fa-tint"></i> Requests</a></li>
+                        <li><a href="#admin-reports"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                        <li><a href="#admin-settings"><i class="fas fa-cog"></i> Settings</a></li>
+                        <li><a href="#" id="admin-logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div class="container mt-4">
+            <h1 class="mb-4">Admin Dashboard</h1>
+            
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 id="admin-donors-count">5,327</h3>
+                    <p>Registered Donors</p>
+                    <a href="#admin-donors" class="btn btn-outline btn-sm mt-2">Manage Donors</a>
+                </div>
+                <div class="dashboard-card">
+                    <div class="icon">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <h3 id="admin-blood-units">1,243</h3>
+                    <p>Blood Units Available</p>
+                    <a href="#admin-inventory" class="btn btn-outline btn-sm mt-2">View Inventory</a>
+                </div>
+                <div class="dashboard-card">
+                    <div class="icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h3 id="admin-pending-requests">24</h3>
+                    <p>Pending Requests</p>
+                    <a href="#admin-requests" class="btn btn-outline btn-sm mt-2">Manage Requests</a>
+                </div>
+                <div class="dashboard-card">
+                    <div class="icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 id="admin-completed-requests">1,842</h3>
+                    <p>Completed Requests</p>
+                    <a href="#admin-requests" class="btn btn-outline btn-sm mt-2">View All</a>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Blood Requests</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Blood Type</th>
+                                            <th>Units</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>#REQ-1001</td>
+                                            <td>O+</td>
+                                            <td>2</td>
+                                            <td><span class="badge badge-warning">Pending</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#REQ-1002</td>
+                                            <td>A-</td>
+                                            <td>1</td>
+                                            <td><span class="badge badge-success">Approved</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#REQ-1003</td>
+                                            <td>B+</td>
+                                            <td>3</td>
+                                            <td><span class="badge badge-danger">Rejected</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#REQ-1004</td>
+                                            <td>AB+</td>
+                                            <td>2</td>
+                                            <td><span class="badge badge-warning">Pending</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#REQ-1005</td>
+                                            <td>O-</td>
+                                            <td>1</td>
+                                            <td><span class="badge badge-success">Approved</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline">View</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Blood Inventory Status</h2>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="admin-inventory-chart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Donations</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Donor</th>
+                                    <th>Blood Type</th>
+                                    <th>Units</th>
+                                    <th>Date</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>John Smith</td>
+                                    <td>A+</td>
+                                    <td>1</td>
+                                    <td>Today, 10:30 AM</td>
+                                    <td>Main Center</td>
+                                    <td><span class="badge badge-success">Processed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Sarah Johnson</td>
+                                    <td>B-</td>
+                                    <td>1</td>
+                                    <td>Today, 9:15 AM</td>
+                                    <td>North Center</td>
+                                    <td><span class="badge badge-success">Processed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Michael Brown</td>
+                                    <td>O+</td>
+                                    <td>1</td>
+                                    <td>Yesterday, 3:45 PM</td>
+                                    <td>Main Center</td>
+                                    <td><span class="badge badge-success">Processed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Emily Davis</td>
+                                    <td>AB+</td>
+                                    <td>1</td>
+                                    <td>Yesterday, 2:30 PM</td>
+                                    <td>East Center</td>
+                                    <td><span class="badge badge-warning">Testing</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Robert Wilson</td>
+                                    <td>A-</td>
+                                    <td>1</td>
+                                    <td>Yesterday, 11:20 AM</td>
+                                    <td>Main Center</td>
+                                    <td><span class="badge badge-success">Processed</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donor Dashboard (Hidden by default) -->
+    <div id="donor-dashboard" style="display: none;">
+        <div class="header">
+            <div class="container">
+                <nav class="navbar">
+                    <a href="#" class="logo">
+                        <i class="fas fa-heartbeat"></i> BloodLink Donor
+                    </a>
+                    <ul class="nav-links" id="donor-nav-links">
+                        <li class="active"><a href="#donor-home"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="#donor-profile"><i class="fas fa-user"></i> Profile</a></li>
+                        <li><a href="#donor-history"><i class="fas fa-history"></i> Donation History</a></li>
+                        <li><a href="#donor-requests"><i class="fas fa-tint"></i> My Requests</a></li>
+                        <li><a href="#donor-rewards"><i class="fas fa-award"></i> Rewards</a></li>
+                        <li><a href="#" id="donor-logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div class="container mt-4">
+            <h1 class="mb-4">Welcome back, <span id="donor-name">John Smith</span>!</h1>
+            
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i> Your last donation on <strong>June 15, 2023</strong> helped save 3 lives. Thank you!
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="icon">
+                        <i class="fas fa-tint blood-group-aplus"></i>
+                    </div>
+                    <h3>A+</h3>
+                    <p>Your Blood Type</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3>June 15, 2023</h3>
+                    <p>Last Donation</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>12</h3>
+                    <p>Total Donations</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="icon">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <h3>1,250</h3>
+                    <p>Reward Points</p>
+                    <a href="#donor-rewards" class="btn btn-outline btn-sm mt-2">Redeem</a>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Next Eligible Donation</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center">
+                                <div class="mb-3">
+                                    <i class="fas fa-calendar-check" style="font-size: 3rem; color: var(--success);"></i>
+                                </div>
+                                <h3>August 10, 2023</h3>
+                                <p class="text-muted">56 days after your last donation</p>
+                                <div class="progress mt-3" style="height: 10px; border-radius: 5px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <p class="mt-2">22 days remaining until you can donate again</p>
+                                <button class="btn btn-outline mt-2">Schedule Appointment</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Your Impact</h2>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="donor-impact-chart" height="200"></canvas>
+                            <div class="text-center mt-3">
+                                <h4>36 Lives Saved</h4>
+                                <p class="text-muted">Through your 12 donations</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Donation History</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Location</th>
+                                    <th>Blood Type</th>
+                                    <th>Status</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>June 15, 2023</td>
+                                    <td>Main Donation Center</td>
+                                    <td>A+</td>
+                                    <td><span class="badge badge-success">Completed</span></td>
+                                    <td>100</td>
+                                </tr>
+                                <tr>
+                                    <td>April 20, 2023</td>
+                                    <td>Mobile Blood Drive</td>
+                                    <td>A+</td>
+                                    <td><span class="badge badge-success">Completed</span></td>
+                                    <td>100</td>
+                                </tr>
+                                <tr>
+                                    <td>February 23, 2023</td>
+                                    <td>Main Donation Center</td>
+                                    <td>A+</td>
+                                    <td><span class="badge badge-success">Completed</span></td>
+                                    <td>100</td>
+                                </tr>
+                                <tr>
+                                    <td>December 28, 2022</td>
+                                    <td>Main Donation Center</td>
+                                    <td>A+</td>
+                                    <td><span class="badge badge-success">Completed</span></td>
+                                    <td>100</td>
+                                </tr>
+                                <tr>
+                                    <td>October 25, 2022</td>
+                                    <td>Community Hospital</td>
+                                    <td>A+</td>
+                                    <td><span class="badge badge-success">Completed</span></td>
+                                    <td>100</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <a href="#donor-history" class="btn btn-outline mt-2">View Full History</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const navLinks = document.getElementById('nav-links');
+            
+            if (mobileMenuBtn && navLinks) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                });
+            }
+            
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                        
+                        // Close mobile menu if open
+                        if (navLinks.classList.contains('active')) {
+                            navLinks.classList.remove('active');
+                        }
+                    }
+                });
+            });
+            
+            // Form validation
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const requiredFields = form.querySelectorAll('[required]');
+                    let isValid = true;
+                    
+                    requiredFields.forEach(field => {
+                        if (!field.value.trim()) {
+                            field.classList.add('error');
+                            isValid = false;
+                        } else {
+                            field.classList.remove('error');
+                        }
+                    });
+                    
+                    if (isValid) {
+                        // Show success message
+                        const alert = document.createElement('div');
+                        alert.className = 'alert alert-success';
+                        alert.innerHTML = '<i class="fas fa-check-circle"></i> Form submitted successfully!';
+                        form.parentNode.insertBefore(alert, form.nextSibling);
+                        
+                        // Reset form
+                        form.reset();
+                        
+                        // Remove alert after 5 seconds
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 5000);
+                    } else {
+                        // Show error message
+                        const alert = document.createElement('div');
+                        alert.className = 'alert alert-danger';
+                        alert.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please fill in all required fields.';
+                        form.parentNode.insertBefore(alert, form.nextSibling);
+                        
+                        // Remove alert after 5 seconds
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 5000);
+                    }
+                });
+            });
+            
+            // Tab functionality
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and content
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    this.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Modal functionality
+            const loginBtn = document.getElementById('login-btn');
+            const loginModal = document.getElementById('loginModal');
+            const registerModal = document.getElementById('registerModal');
+            const showRegister = document.getElementById('show-register');
+            const showLogin = document.getElementById('show-login');
+            const closeButtons = document.querySelectorAll('.close');
+            
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    loginModal.classList.add('show');
+                });
+            }
+            
+            if (showRegister) {
+                showRegister.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    loginModal.classList.remove('show');
+                    registerModal.classList.add('show');
+                });
+            }
+            
+            if (showLogin) {
+                showLogin.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    registerModal.classList.remove('show');
+                    loginModal.classList.add('show');
+                });
+            }
+            
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.closest('.modal').classList.remove('show');
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal')) {
+                    e.target.classList.remove('show');
+                }
+            });
+            
+            // Admin/Donor dashboard toggle (for demo purposes)
+            const adminLogout = document.getElementById('admin-logout');
+            const donorLogout = document.getElementById('donor-logout');
+            
+            // Demo login functionality
+            document.getElementById('modal-login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                // Simple demo check
+                if (email.includes('admin') && password === 'admin123') {
+                    // Show admin dashboard
+                    document.getElementById('admin-dashboard').style.display = 'block';
+                    document.getElementById('donor-dashboard').style.display = 'none';
+                    document.documentElement.style.display = 'none';
+                    loginModal.classList.remove('show');
+                    window.scrollTo(0, 0);
+                } else if (email.includes('donor') && password === 'donor123') {
+                    // Show donor dashboard
+                    document.getElementById('donor-dashboard').style.display = 'block';
+                    document.getElementById('admin-dashboard').style.display = 'none';
+                    document.documentElement.style.display = 'none';
+                    loginModal.classList.remove('show');
+                    window.scrollTo(0, 0);
+                } else {
+                    alert('Invalid credentials. Use "admin@example.com" with password "admin123" or "donor@example.com" with password "donor123" for demo.');
+                }
+            });
+            
+            // Logout functionality
+            if (adminLogout) {
+                adminLogout.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('admin-dashboard').style.display = 'none';
+                    document.documentElement.style.display = '';
+                    window.scrollTo(0, 0);
+                });
+            }
+            
+            if (donorLogout) {
+                donorLogout.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('donor-dashboard').style.display = 'none';
+                    document.documentElement.style.display = '';
+                    window.scrollTo(0, 0);
+                });
+            }
+            
+            // Inventory Chart
+            const inventoryCtx = document.getElementById('inventory-chart').getContext('2d');
+            const inventoryChart = new Chart(inventoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+                    datasets: [{
+                        label: 'Blood Units Available',
+                        data: [124, 87, 156, 92, 45, 32, 210, 18],
+                        backgroundColor: [
+                            'rgba(230, 57, 70, 0.7)',
+                            'rgba(168, 218, 220, 0.7)',
+                            'rgba(29, 53, 87, 0.7)',
+                            'rgba(69, 123, 157, 0.7)',
+                            'rgba(42, 157, 143, 0.7)',
+                            'rgba(233, 196, 106, 0.7)',
+                            'rgba(231, 111, 81, 0.7)',
+                            'rgba(131, 56, 236, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(230, 57, 70, 1)',
+                            'rgba(168, 218, 220, 1)',
+                            'rgba(29, 53, 87, 1)',
+                            'rgba(69, 123, 157, 1)',
+                            'rgba(42, 157, 143, 1)',
+                            'rgba(233, 196, 106, 1)',
+                            'rgba(231, 111, 81, 1)',
+                            'rgba(131, 56, 236, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 50
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw} units`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Usage Trend Chart
+            const usageTrendCtx = document.getElementById('usage-trend-chart').getContext('2d');
+            const usageTrendChart = new Chart(usageTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [
+                        {
+                            label: 'Blood Collected',
+                            data: [320, 290, 350, 410, 380, 420, 390],
+                            borderColor: 'rgba(42, 157, 143, 1)',
+                            backgroundColor: 'rgba(42, 157, 143, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Blood Used',
+                            data: [280, 310, 290, 350, 400, 380, 410],
+                            borderColor: 'rgba(230, 57, 70, 1)',
+                            backgroundColor: 'rgba(230, 57, 70, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw} units`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Initialize map (simplified for demo)
+            // Initialize map centered on India
+if (document.getElementById('map')) {
+    const map = L.map('map').setView([20.5937, 78.9629], 5); // Centered on India with zoom level 5
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Add markers for major Indian cities with blood type information
+    const indianCities = [
+        { name: "New Delhi", coords: [28.6139, 77.2090], bloodType: "O+", donors: 1250 },
+        { name: "Mumbai", coords: [19.0760, 72.8777], bloodType: "A+", donors: 980 },
+        { name: "Bangalore", coords: [12.9716, 77.5946], bloodType: "B+", donors: 850 },
+        { name: "Hyderabad", coords: [17.3850, 78.4867], bloodType: "AB+", donors: 420 },
+        { name: "Chennai", coords: [13.0827, 80.2707], bloodType: "O-", donors: 380 },
+        { name: "Kolkata", coords: [22.5726, 88.3639], bloodType: "A-", donors: 520 },
+        { name: "Pune", coords: [18.5204, 73.8567], bloodType: "B-", donors: 450 },
+        { name: "Ahmedabad", coords: [23.0225, 72.5714], bloodType: "AB-", donors: 320 },
+        { name: "Jaipur", coords: [26.9124, 75.7873], bloodType: "O+", donors: 380 },
+        { name: "Lucknow", coords: [26.8467, 80.9462], bloodType: "A+", donors: 410 }
+    ];
+    
+    const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+    const colors = ['#e63946', '#a8dadc', '#1d3557', '#457b9d', '#2a9d8f', '#e9c46a', '#e76f51', '#8338ec'];
+    
+    // Create a feature group to store our markers
+    const markers = L.featureGroup().addTo(map);
+    
+    // Add circle markers for each city
+    indianCities.forEach(city => {
+        const color = colors[bloodGroups.indexOf(city.bloodType)];
+        const marker = L.circleMarker(city.coords, {
+            radius: 8 + (city.donors / 200), // Scale marker size by number of donors
+            fillColor: color,
+            color: '#fff',
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.8
+        }).addTo(markers);
+        
+        marker.bindPopup(`
+            <b>${city.name}</b><br>
+            <i class="fas fa-tint blood-group-${city.bloodType.toLowerCase().replace('+', 'plus').replace('-', 'minus')}"></i> 
+            Blood Type: ${city.bloodType}<br>
+            <i class="fas fa-users"></i> Active Donors: ${city.donors.toLocaleString()}
+        `);
+    });
+    
+    // Fit map to show all markers
+    map.fitBounds(markers.getBounds().pad(0.1));
+    
+    // Filter functionality
+    document.getElementById('filter-blood-type').addEventListener('change', function() {
+        const selectedType = this.value;
+        markers.eachLayer(layer => {
+            if (selectedType === 'all' || layer._popup._content.includes(`Blood Type: ${selectedType}`)) {
+                layer.setStyle({ opacity: 1, fillOpacity: 0.8 });
+            } else {
+                layer.setStyle({ opacity: 0.3, fillOpacity: 0.2 });
+            }
+        });
+    });
+}
+            
+            // Admin Inventory Chart
+            if (document.getElementById('admin-inventory-chart')) {
+                const adminInventoryCtx = document.getElementById('admin-inventory-chart').getContext('2d');
+                const adminInventoryChart = new Chart(adminInventoryCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+                        datasets: [{
+                            data: [124, 87, 156, 92, 45, 32, 210, 18],
+                            backgroundColor: [
+                                'rgba(230, 57, 70, 0.7)',
+                                'rgba(168, 218, 220, 0.7)',
+                                'rgba(29, 53, 87, 0.7)',
+                                'rgba(69, 123, 157, 0.7)',
+                                'rgba(42, 157, 143, 0.7)',
+                                'rgba(233, 196, 106, 0.7)',
+                                'rgba(231, 111, 81, 0.7)',
+                                'rgba(131, 56, 236, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(230, 57, 70, 1)',
+                                'rgba(168, 218, 220, 1)',
+                                'rgba(29, 53, 87, 1)',
+                                'rgba(69, 123, 157, 1)',
+                                'rgba(42, 157, 143, 1)',
+                                'rgba(233, 196, 106, 1)',
+                                'rgba(231, 111, 81, 1)',
+                                'rgba(131, 56, 236, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.label}: ${context.raw} units`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Donor Impact Chart
+            if (document.getElementById('donor-impact-chart')) {
+                const donorImpactCtx = document.getElementById('donor-impact-chart').getContext('2d');
+                const donorImpactChart = new Chart(donorImpactCtx, {
+                    type: 'polarArea',
+                    data: {
+                        labels: ['Children', 'Women', 'Men', 'Elderly', 'Accident Victims'],
+                        datasets: [{
+                            data: [8, 12, 7, 5, 4],
+                            backgroundColor: [
+                                'rgba(230, 57, 70, 0.7)',
+                                'rgba(168, 218, 220, 0.7)',
+                                'rgba(29, 53, 87, 0.7)',
+                                'rgba(42, 157, 143, 0.7)',
+                                'rgba(231, 111, 81, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(230, 57, 70, 1)',
+                                'rgba(168, 218, 220, 1)',
+                                'rgba(29, 53, 87, 1)',
+                                'rgba(42, 157, 143, 1)',
+                                'rgba(231, 111, 81, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            r: {
+                                pointLabels: {
+                                    display: true,
+                                    centerPointLabels: true,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.label}: ${context.raw} lives saved`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Animate stats counters
+            function animateValue(id, start, end, duration) {
+                const obj = document.getElementById(id);
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    const value = Math.floor(progress * (end - start) + start);
+                    obj.innerHTML = value.toLocaleString();
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+            
+            // Start animations when stats come into view
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateValue('donors-count', 0, 5327, 2000);
+                        animateValue('donations-count', 0, 12894, 2000);
+                        animateValue('lives-saved', 0, 38682, 2000);
+                        animateValue('blood-units', 0, 1243, 2000);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            const statsSection = document.querySelector('.stats');
+            if (statsSection) {
+                observer.observe(statsSection);
+            }
+            
+            // Update inventory status indicators
+            const inventoryStatus = {
+                'aplus': 124,
+                'aminus': 87,
+                'bplus': 156,
+                'bminus': 92,
+                'abplus': 45,
+                'abminus': 32,
+                'oplus': 210,
+                'ominus': 18
+            };
+            
+            for (const [type, count] of Object.entries(inventoryStatus)) {
+                const statusElement = document.getElementById(`${type}-status`);
+                if (statusElement) {
+                    if (count > 50) {
+                        statusElement.className = 'badge badge-success';
+                        statusElement.textContent = 'Adequate';
+                    } else if (count > 25) {
+                        statusElement.className = 'badge badge-warning';
+                        statusElement.textContent = 'Low';
+                    } else if (count > 10) {
+                        statusElement.className = 'badge badge-danger';
+                        statusElement.textContent = 'Critical';
+                    } else {
+                        statusElement.className = 'badge badge-danger';
+                        statusElement.textContent = 'Emergency';
+                    }
+                }
+            }
+            
+            // Refresh inventory button
+            document.getElementById('refresh-inventory')?.addEventListener('click', function() {
+                this.innerHTML = '<span class="spinner"></span> Refreshing...';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                    document.getElementById('last-updated').textContent = new Date().toLocaleString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    // Show alert
+                    const alert = document.createElement('div');
+                    alert.className = 'alert alert-success';
+                    alert.innerHTML = '<i class="fas fa-check-circle"></i> Inventory data refreshed successfully!';
+                    this.parentNode.parentNode.parentNode.insertBefore(alert, this.parentNode.parentNode.nextSibling);
+                    
+                    // Remove alert after 5 seconds
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 5000);
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
